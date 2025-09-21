@@ -1,7 +1,10 @@
-FROM php:8-apache
+FROM php:8-nginx
 
-# Enable Apache proxy modules
-RUN a2enmod proxy proxy_http
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the application code
 COPY index.php /var/www/html/
+
+# Expose port 80
+EXPOSE 80
