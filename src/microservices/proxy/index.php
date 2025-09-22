@@ -11,11 +11,11 @@ $targetUrl = '';
 if (strpos($requestUri, '/api/movies') === 0) {
     if ((int)$migrationPercent > 0 && rand(1, 100) <= (int)$migrationPercent) {
         $targetUrl = $moviesServiceUrl . $requestUri;
-    } elseif (strpos($requestUri, '/api/events') === 0) {
-        $targetUrl = $eventsServiceUrl . $requestUri;
     } else {
         $targetUrl = $monolithUrl . $requestUri;
     }
+} elseif (strpos($requestUri, '/api/events') === 0) {
+        $targetUrl = $eventsServiceUrl . $requestUri;
 } else {
     $targetUrl = $monolithUrl . $requestUri;
 }
