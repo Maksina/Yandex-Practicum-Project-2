@@ -18,27 +18,41 @@ $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 // --- API Router ---
-if ($requestMethod === 'POST') {
-    $topicName = '';
-    if (strpos($requestUri, '/api/events/movie') === 0) {
-        $topicName = 'movie-events';
-    } elseif (strpos($requestUri, '/api/events/user') === 0) {
-        $topicName = 'user-events';
-    } elseif (strpos($requestUri, '/api/events/payment') === 0) {
-        $topicName = 'payment-events';
-    }
+$path = parse_url($requestUri, PHP_URL_PATH);
 
-    if ($topicName) {
-        handleEventRequest($topicName, $kafkaBrokers);
-    } else {
-        http_response_code(404);
-        echo json_encode(['error' => 'Not Found']);
-    }
-} elseif ($requestUri === '/health' || $requestUri === '/api/events/health') {
-    echo json_encode(['status' => 'ok', 'service' => 'events-service']);
-} else {
-    http_response_code(404);
-    echo json_encode(['error' => 'Not Found']);
+switch ($path) {
+    case '/health':
+    case '/api/events/health':
+        if ($requestMethod === 'GET') {
+            echo json_encode(['status' => 'ok', 'service' => 'events-service']);
+        } else {
+            http_response_code(405); // Method Not Allowed
+            echo json_encode(['error' => 'Method Not Allowed']);
+        }
+        break;
+
+    default:
+        if ($requestMethod === 'POST') {
+            $topicName = '';
+            if (strpos($path, '/api/events/movie') === 0) {
+                $topicName = 'movie-events';
+            } elseif (strpos($path, '/api/events/user') === 0) {
+                $topicName = 'user-events';
+            } elseif (strpos($path, '/api/events/payment') === 0) {
+                $topicName = 'payment-events';
+            }
+
+            if ($topicName) {
+                handleEventRequest($topicName, $kafkaBrokers);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'Not Found']);
+            }
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Not Found']);
+        }
+        break;
 }
 
 /**
