@@ -1,10 +1,10 @@
-FROM mirror.gcr.io/library/php:8-nginx
+FROM php:8.2-fpm-alpine
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Set working directory
+WORKDIR /var/www/html
 
-# Copy the application code
-COPY index.php /var/www/html/
+# Copy application code
+COPY index.php .
 
-# Expose port 80
-EXPOSE 80
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
