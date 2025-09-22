@@ -1,4 +1,4 @@
-FROM php:8.2-nginx
+FROM mirror.gcr.io/library/php:8.2-nginx
 
 # Install system dependencies for rdkafka
 RUN apt-get update && apt-get install -y \

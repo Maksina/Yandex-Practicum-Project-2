@@ -1,4 +1,4 @@
-FROM php:8-nginx
+FROM mirror.gcr.io/library/php:8-nginx
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
