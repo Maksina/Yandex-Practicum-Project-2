@@ -83,7 +83,7 @@ services:
       - cinemaabyss-network
 
   # Events Microservice (PHP-FPM)
-  events-service:
+  events-php:
     build:
       context: ./src/microservices/events
       dockerfile: Dockerfile
@@ -111,7 +111,7 @@ services:
       - cinemaabyss-network
 
   # Proxy Service (PHP-FPM)
-  proxy-service:
+  proxy-php:
     build:
       context: ./src/microservices/proxy
       dockerfile: Dockerfile
