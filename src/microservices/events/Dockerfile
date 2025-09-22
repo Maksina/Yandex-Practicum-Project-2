@@ -1,14 +1,14 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 # Install system dependencies
-RUN apk --no-cache add \
+RUN apt-get update && apt-get -y install \
     librdkafka-dev \
     git \
     zip \
     unzip
 
 # Install rdkafka PHP extension
-RUN pecl install rdkafka && docker-php-ext-enable rdkafka
+RUN pecl channel-update pecl.php.net && pecl install rdkafka && docker-php-ext-enable rdkafka && php -m
 
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
