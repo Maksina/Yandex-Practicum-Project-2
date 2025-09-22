@@ -1,6 +1,7 @@
 <?php
 $monolithUrl = getenv('MONOLITH_URL');
 $moviesServiceUrl = getenv('MOVIES_SERVICE_URL');
+$eventsServiceUrl = getenv('EVENTS_SERVICE_URL');
 $migrationPercent = getenv('MOVIES_MIGRATION_PERCENT');
 
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -10,6 +11,8 @@ $targetUrl = '';
 if (strpos($requestUri, '/api/movies') === 0) {
     if ((int)$migrationPercent > 0 && rand(1, 100) <= (int)$migrationPercent) {
         $targetUrl = $moviesServiceUrl . $requestUri;
+    } elseif (strpos($requestUri, '/api/events') === 0) {
+        $targetUrl = $eventsServiceUrl . $requestUri;
     } else {
         $targetUrl = $monolithUrl . $requestUri;
     }

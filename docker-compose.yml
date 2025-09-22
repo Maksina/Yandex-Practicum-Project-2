@@ -117,9 +117,9 @@ services:
       dockerfile: Dockerfile
     container_name: cinemaabyss-proxy-php
     environment:
-      MONOLITH_URL: monolith:8080
-      MOVIES_SERVICE_URL: movies-service:8081
-      EVENTS_SERVICE_URL: events-nginx:8082
+      MONOLITH_URL: http://monolith:8080
+      MOVIES_SERVICE_URL: http://movies-service:8081
+      EVENTS_SERVICE_URL: http://events-nginx:8082
       GRADUAL_MIGRATION: "true"
       MOVIES_MIGRATION_PERCENT: "50"
     networks:
