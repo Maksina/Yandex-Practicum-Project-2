@@ -23,7 +23,7 @@ spec:
       containers:
         - name: proxy-service
           image: ghcr.io/ghostlyfox/architecture-pro-cinemaabyss/proxy-service:latest
-          imagePullPolicy: NotIfPresent
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:

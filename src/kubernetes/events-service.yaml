@@ -23,7 +23,7 @@ spec:
       containers:
         - name: events-servicei
           image:  ghcr.io/ghostlyfox/architecture-pro-cinemaabyss/events-service:latest
-          imagePullPolicy: NotIfPresent
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8082
           env:
