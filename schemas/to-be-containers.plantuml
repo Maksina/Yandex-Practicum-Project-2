@@ -1,0 +1,112 @@
+@startuml containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(client, "Пользователь", "Клиент сервиса Кинобездна")
+
+System_Boundary(CinemaAbyss, "Кинобездна"){
+    
+    Container(WebInterface, "Веб-интерфейс", "VueJS", "Веб-интерфейс Кинобездны")
+    Container(AndroidMobileApp, "Мобильное приложение Android", "Kotlin", "Мобильное приложение Кинобездны")
+    Container(IOSMobileApp, "Мобильное приложение IOS", "Swift", "Мобильное приложение Кинобездны")
+    Container(TizenApp, "Приложение для SmartTV Samsung Tizen", "JS/REACT", "Приложение для телевизоров Samsung")
+    Container(WebOSApp, "Приложение для SmartTV LG WebOS", "JS/REACT", "Приложение для телевизоров LG")
+    Container(AndroidTVApp, "Приложение для SmartTV Android", "Kotlin", "Приложение для телевизоров на Android")
+    
+    Container_Boundary(k8s, "Kubernetes Cluster"){
+
+        Container_Boundary(BFFLayer, "BFFLayer"){
+            Container(AndroidMobileAppBFF, "BFF: Мобильное приложение Android", "Kotlin")
+            Container(IOSMobileAppBFF, "BFF: Мобильное приложение IOS", "Swift")
+            Container(TizenAppBFF, "BFF:Приложение для SmartTV Samsung Tizen", "node.js")
+            Container(WebOSAppBFF, "BFF: Приложение для SmartTV LG WebOS", "node.js")
+            Container(AndroidTVAppBFF, "BFF: Приложение для SmartTV Android", "Kotlin")
+            Container(WebInterfaceBFF, "BFF: Веб-интерфейс", "node.js")   
+        }
+
+        Container(ApiGateway, "API Gateway", "Kong", "Маршрутизация запросов")
+        Container(keycloak, "Keycloak", "OpenID", "Аутентификация и авторизация")
+
+        Container(MoviesService, "MoviesService", "Go", "Управление фильмами")
+        Container(PaymentService, "PaymentService", "Java Spring", "Управление платежами")
+        Container(UserService, "UserService", "Java Spring", "Управление информацией о пользователе")
+        Container(SubscribeService, "SubscribeService", "Java Spring", "Управление подписками")
+
+        Container_Boundary(DBLayer, "DBLayer"){
+            ContainerDb(SubscribeServiceDB, "SubscribeServiceDB", "PostgreSQL", "Хранение данных о подписке")
+            ContainerDb(UserServiceDB, "UserServiceDB", "PostgreSQL", "Хранение данных пользователя")
+            ContainerDb(PaymentServiceDB, "PaymentServiceDB", "PostgreSQL", "Хранение данных о платежах")
+            ContainerDb(MoviesServiceDB, "MoviesServiceDB", "PostgreSQL", "Хранение данных о фильмах")
+        }
+        Container_Boundary(OnlineCinemasGateway, "ExternalOlineCinemas Gateway"){
+            Container(OnlineCinemasAggregator, "OnlineCinemasAggregator", "Python", "Предоставление единой точки входа в API внешних онлайн-кинотеатров")
+            Container(KinopoiskAdapter, "KinopoiskAdapter", "Python", "Получение информации из Кинопоиска и преобразование ответа в единый формат")
+            Container(OkkoAdapter, "OKKOAdapter", "Python", "Получение информации из OKKO и преобразование ответа в единый формат")
+            Container(StartAdapter, "STARTAdapter", "Python", "Получение информации из START и преобразование ответа в единый формат")
+        }
+    }   
+}
+
+System_Boundary(YandexCloud, "YandexCloud"){
+    ContainerDb_Ext(s3, "S3", "Yandex Object Storage", "Внутреннее хранилище видео")
+}
+
+System_Boundary(ExternalOnlineCinemas, "Внешние онлайн кинотеатры"){
+    System_Ext(kinopoisk, "Кинопоиск", "Онлайн-кинотеатр Кинопоиск")
+    System_Ext(start, "START", "Онлайн-кинотеатр START")
+    System_Ext(okko, "OKKO", "Онлайн-кинотеатр OKKO")
+}
+
+System_Ext(ExternalPaymentSystem, "Платежная система", "Обработка платежей")
+
+Rel(client, WebInterface, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+Rel(client, AndroidMobileApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+Rel(client, IOSMobileApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+Rel(client, TizenApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+Rel(client, WebOSApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+Rel(client, AndroidTVApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
+
+Rel(WebInterface, WebInterfaceBFF, "Вызов API", HTTP)
+Rel(AndroidMobileApp, AndroidMobileAppBFF, "Вызов API", HTTP)
+Rel(IOSMobileApp, IOSMobileAppBFF, "Вызов API", HTTP)
+Rel(TizenApp, TizenAppBFF, "Вызов API", HTTP)
+Rel(WebOSApp, WebOSAppBFF, "Вызов API", HTTP)
+Rel(AndroidTVApp, AndroidTVAppBFF, "Вызов API", HTTP)
+
+Rel(BFFLayer, keycloak, "Авторизация и аутентификация", "HTTP")
+Rel(ApiGateway, keycloak, "Проверка токена", "HTTP")
+
+Rel(WebInterfaceBFF, ApiGateway, "Вызов API", HTTP)
+Rel(AndroidMobileAppBFF, ApiGateway, "Вызов API", HTTP)
+Rel(IOSMobileAppBFF, ApiGateway, "Вызов API", HTTP)
+Rel(TizenAppBFF, ApiGateway, "Вызов API", HTTP)
+Rel(WebOSAppBFF, ApiGateway, "Вызов API", HTTP)
+Rel(AndroidTVAppBFF, ApiGateway, "Вызов API", HTTP)
+
+Rel(ApiGateway, MoviesService, "Маршрутизация запросов", HTTP)
+Rel(MoviesService, s3, "Чтение/запись", HTTP)
+Rel(MoviesService, MoviesServiceDB, "Чтение/запись", JDBC)
+Rel(MoviesService, OnlineCinemasAggregator, "Получение контента из внешних источников", HTTP)
+
+Rel(ApiGateway, PaymentService, "Маршрутизация запросов", HTTP)
+Rel(PaymentService, PaymentServiceDB, "Чтение/запись", JDBC)
+Rel(PaymentService, ExternalPaymentSystem, "Вызов API", HTTP)
+
+Rel(ApiGateway, UserService, "Маршрутизация запросов", HTTP)
+Rel(UserService, UserServiceDB, "Чтение/запись", JDBC)
+
+Rel(ApiGateway, SubscribeService, "Маршрутизация запросов", HTTP)
+Rel(SubscribeService, SubscribeServiceDB, "Чтение/запись", JDBC)
+
+Rel(OnlineCinemasAggregator, KinopoiskAdapter, "Вызов API", HTTP)
+Rel(OnlineCinemasAggregator, OkkoAdapter, "Вызов API", HTTP)
+Rel(OnlineCinemasAggregator, StartAdapter, "Вызов API", HTTP)
+
+Rel(KinopoiskAdapter, kinopoisk, "Вызов API", HTTP)
+Rel(OkkoAdapter, okko, "Вызов API", HTTP)
+Rel(StartAdapter, start, "Вызов API", HTTP)
+
+
+
+Lay_D(ApiGateway, keycloak)
+
+@enduml
