@@ -23,7 +23,7 @@ System_Boundary(CinemaAbyss, "Кинобездна"){
             Container(WebInterfaceBFF, "BFF: Веб-интерфейс", "node.js")   
         }
 
-        Container(ApiGateway, "API Gateway", "Kong", "Маршрутизация запросов")
+        Container(ApiGateway, "API Gateway", "Spring Cloud Gateway", "Маршрутизация запросов")
         Container(keycloak, "Keycloak", "OpenID", "Аутентификация и авторизация")
 
         Container(MoviesService, "MoviesService", "Go", "Управление фильмами")
@@ -33,7 +33,6 @@ System_Boundary(CinemaAbyss, "Кинобездна"){
         Container(RecomendationService, "RecomendationService", "Java Spring", "Управление рекомендациями")
         Container(NotificationService, "NotificationService", "Java Spring", "Управление оповещениями (SMS,Email,Push)")
         Container(AnalyticsService, "AnalyticsService", "Python", "Управление аналитикой")
-        Container(EventService, "EventService", "Python", "Управление событиями")
 
         Container(Kafka, "Kafka", "Kafka", "Шина событий")
         Container(RabbitMQ, "RabbitMQ", "Брокер сообщений для интеграции с внешней рекомендательной системой")
@@ -133,11 +132,9 @@ Rel(PaymentService, Kafka, "Публикация событий платежей
 Rel(UserService, Kafka, "Публикация событий пользователей (регистрация, вход)", "Producer")
 Rel(SubscribeService, Kafka, "Публикация событий подписки (оформлена, истекла)", "Producer")
 
-Rel(EventService, Kafka, "Чтение всех событий", "Consumer")
-
-Rel(EventService, RecomendationService, "Передача информации о просмотренных фильмах", HTTP)
-Rel(EventService, NotificationService, "Отправка уведомлений на основе событий", HTTP)
-Rel(EventService, AnalyticsService, "Сохранение аналитики на основе событий", HTTP)
+Rel(RecomendationService, Kafka,  "Подписка на события", "Consumer")
+Rel(NotificationService, Kafka, "Подписка на события", "Consumer")
+Rel(AnalyticsService, Kafka, "Подписка на события", "Consumer")
 
 Lay_D(Kafka, DBLayer)
 Lay_D(Kafka, ExternalOlineCinemas)
