@@ -1,0 +1,18 @@
+server:
+  port: ${PORT:8080}
+
+monolith:
+  url: ${MONOLITH_URL}
+
+movies:
+  service:
+    url: ${MOVIES_SERVICE_URL}
+  migration:
+    percent: ${MOVIES_MIGRATION_PERCENT}
+
+gradual:
+  migration: ${GRADUAL_MIGRATION}
+
+events:
+  service:
+    url: ${EVENTS_SERVICE_URL}
