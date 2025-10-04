@@ -30,12 +30,22 @@ System_Boundary(CinemaAbyss, "Кинобездна"){
         Container(PaymentService, "PaymentService", "Java Spring", "Управление платежами")
         Container(UserService, "UserService", "Java Spring", "Управление информацией о пользователе")
         Container(SubscribeService, "SubscribeService", "Java Spring", "Управление подписками")
+        Container(RecomendationService, "RecomendationService", "Java Spring", "Управление рекомендациями")
+        Container(NotificationService, "NotificationService", "Java Spring", "Управление оповещениями (SMS,Email,Push)")
+        Container(AnalyticsService, "AnalyticsService", "Python", "Управление аналитикой")
+        Container(EventService, "EventService", "Python", "Управление событиями")
+
+        Container(Kafka, "Kafka", "Kafka", "Шина событий")
+        Container(RabbitMQ, "RabbitMQ", "Брокер сообщений для интеграции с внешней рекомендательной системой")
 
         Container_Boundary(DBLayer, "DBLayer"){
             ContainerDb(SubscribeServiceDB, "SubscribeServiceDB", "PostgreSQL", "Хранение данных о подписке")
             ContainerDb(UserServiceDB, "UserServiceDB", "PostgreSQL", "Хранение данных пользователя")
             ContainerDb(PaymentServiceDB, "PaymentServiceDB", "PostgreSQL", "Хранение данных о платежах")
             ContainerDb(MoviesServiceDB, "MoviesServiceDB", "PostgreSQL", "Хранение данных о фильмах")
+            ContainerDb(NotificationServiceDB, "NotificationServiceDB", "PostgreSQL", "Хранение шаблонов и данных оповещений")
+            ContainerDb(AnalyticsServiceDB, "AnalyticsServiceDB", "ClickHouse", "Хранение аналитических данных")
+
         }
         Container_Boundary(OnlineCinemasGateway, "ExternalOlineCinemas Gateway"){
             Container(OnlineCinemasAggregator, "OnlineCinemasAggregator", "Python", "Предоставление единой точки входа в API внешних онлайн-кинотеатров")
@@ -57,6 +67,7 @@ System_Boundary(ExternalOnlineCinemas, "Внешние онлайн киноте
 }
 
 System_Ext(ExternalPaymentSystem, "Платежная система", "Обработка платежей")
+System_Ext(ExternalRecomendationSystem, "Рекомендательная система", "Предоставление рекомендаций по полученным данным")
 
 Rel(client, WebInterface, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
 Rel(client, AndroidMobileApp, "Просмотр фильмов, рекомендаций и информации о кино", HTTP)
@@ -82,7 +93,7 @@ Rel(TizenAppBFF, ApiGateway, "Вызов API", HTTP)
 Rel(WebOSAppBFF, ApiGateway, "Вызов API", HTTP)
 Rel(AndroidTVAppBFF, ApiGateway, "Вызов API", HTTP)
 
-Rel(ApiGateway, MoviesService, "Маршрутизация запросов", HTTP)
+Rel_D(ApiGateway, MoviesService, "Маршрутизация запросов", HTTP)
 Rel(MoviesService, s3, "Чтение/запись", HTTP)
 Rel(MoviesService, MoviesServiceDB, "Чтение/запись", JDBC)
 Rel(MoviesService, OnlineCinemasAggregator, "Получение контента из внешних источников", HTTP)
@@ -97,6 +108,17 @@ Rel(UserService, UserServiceDB, "Чтение/запись", JDBC)
 Rel(ApiGateway, SubscribeService, "Маршрутизация запросов", HTTP)
 Rel(SubscribeService, SubscribeServiceDB, "Чтение/запись", JDBC)
 
+Rel(ApiGateway, RecomendationService, "Маршрутизация запросов", HTTP)
+Rel(RecomendationService, RabbitMQ, "Публикация событий о просмотрах пользователя/Получение рекомендаций", AMQP)
+Rel(ExternalRecomendationSystem, RabbitMQ, "Получение событий о просмотрах пользователя/Публикация рекомендаций", AMQP)
+
+Rel(ApiGateway, NotificationService, "Маршрутизация запросов", HTTP)
+Rel(NotificationService, NotificationServiceDB, "Чтение/запись", JDBC)
+
+Rel_D(ApiGateway, AnalyticsService, "Маршрутизация запросов", HTTP)
+Rel(AnalyticsService, AnalyticsServiceDB, "Чтение/запись", JDBC)
+
+
 Rel(OnlineCinemasAggregator, KinopoiskAdapter, "Вызов API", HTTP)
 Rel(OnlineCinemasAggregator, OkkoAdapter, "Вызов API", HTTP)
 Rel(OnlineCinemasAggregator, StartAdapter, "Вызов API", HTTP)
@@ -106,7 +128,18 @@ Rel(OkkoAdapter, okko, "Вызов API", HTTP)
 Rel(StartAdapter, start, "Вызов API", HTTP)
 
 
+Rel(MoviesService, Kafka, "Публикация событий фильмов (Просмотр, оценка, добавление)", "Producer")
+Rel(PaymentService, Kafka, "Публикация событий платежей (успешные, неудачные)", "Producer")
+Rel(UserService, Kafka, "Публикация событий пользователей (регистрация, вход)", "Producer")
+Rel(SubscribeService, Kafka, "Публикация событий подписки (оформлена, истекла)", "Producer")
 
-Lay_D(ApiGateway, keycloak)
+Rel(EventService, Kafka, "Чтение всех событий", "Consumer")
+
+Rel(EventService, RecomendationService, "Передача информации о просмотренных фильмах", HTTP)
+Rel(EventService, NotificationService, "Отправка уведомлений на основе событий", HTTP)
+Rel(EventService, AnalyticsService, "Сохранение аналитики на основе событий", HTTP)
+
+Lay_D(Kafka, DBLayer)
+Lay_D(Kafka, ExternalOlineCinemas)
 
 @enduml
