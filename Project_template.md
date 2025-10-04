@@ -12,14 +12,16 @@
 
 ### 1. Proxy
 
-Реализовано с использование Spring Cloud Gateway.
+Реализовано с использованием Spring Cloud Gateway.
 
 ### 2. Kafka
 
-**Результаты тестов**
+**Результаты тестов**  
+[Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/tests.png)
 ![Image Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/tests.png)
 
-**Состояние топиков**
+**Состояние топиков**  
+[Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/topics.png)
 ![Image Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/topics.png)
 
 ## Задание 3
