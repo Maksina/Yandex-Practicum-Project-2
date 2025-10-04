@@ -18,15 +18,15 @@
 
 **Результаты тестов**  
 
-[Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/tests.png)
+[Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-2/tests.png)
 
-![Image Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/tests.png)
+![Image Результаты тестов](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-2/tests.png)
 
 **Состояние топиков**  
 
-[Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/topics.png)
+[Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-2/topics.png)
 
-![Image Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/topics.png)
+![Image Состояние топиков](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-2/topics.png)
 
 
 ## Задание 3
@@ -39,46 +39,9 @@
 
 ### CI/CD
 
- В папке .github/worflows доработайте деплой новых сервисов proxy и events в docker-build-push.yml , чтобы api-tests при сборке отрабатывали корректно при отправке коммита в вашу новую ветку.
+[CI/CD](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-3/ci-cd.png)
 
-Нужно доработать 
-```yaml
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/**'
-      - '.github/workflows/docker-build-push.yml'
-  release:
-    types: [published]
-```
-и добавить необходимые шаги в блок
-```yaml
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-```
-Как только сборка отработает и в github registry появятся ваши образы, можно переходить к блоку настройки Kubernetes
-Успешным результатом данного шага является "зеленая" сборка и "зеленые" тесты
-
+![Image CI/CD](https://github.com/Maksina/Yandex-Practicum-Project-2/blob/cinema/screenshots/task-3/ci-cd.png)
 
 ### Proxy в Kubernetes
 
