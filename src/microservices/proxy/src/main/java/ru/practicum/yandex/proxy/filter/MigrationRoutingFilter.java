@@ -49,8 +49,6 @@ public class MigrationRoutingFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
-        log.info("🔍 Processing request path: {}", path);
-
         // Применяем логику только к /api/movies
         if (!path.startsWith("/api/movies")) {
             return chain.filter(exchange);
